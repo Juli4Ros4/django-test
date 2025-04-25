@@ -1,15 +1,18 @@
-
-from curses.ascii import FF
-from datetime import timezone
-from typing import Generic
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from .models import Question, Choice
+from django.http import Http404
+from django.db.models import F
 from django.urls import reverse
+from django.views import generic
+from django.utils import timezone
 
-from polls.models import Choice, Question
+
+def index(request):
+    return HttpResponse("Seja muito bem vindo ao meu site.")
 
 
-class IndexView(Generic.ListView):
+class IndexView(generic.ListView):
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
 
@@ -22,7 +25,7 @@ def detail(request, question_id):
     return HttpResponse("You're looking at question %s." % question_id)
 
 
-class DetailView(Generic.DetailView):
+class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/detail.html"
 
@@ -38,7 +41,7 @@ def results(request, question_id):
     return HttpResponse(response % question_id)
 
 
-class ResultsView(Generic.DetailView):
+class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls/results.html"
 
@@ -67,7 +70,7 @@ def vote(request, question_id):
             },
         )
     else:
-        selected_choice.votes = FF("votes") + 1
+        selected_choice.votes = F("votes") + 1
         selected_choice.save()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
